@@ -33,12 +33,18 @@ Despite increasing complexity, none of the GRU models outperformed the persisten
 
 ## Final residual model
 
-Instead of predicting the next level directly, the model predicts the residual:
+The target is modeled in log space:
+y_model[t] = log(1 + y[t])
 
-r[t+1] = y[t+1] − y[t], y_hat[t+1] = y[t] + r_hat[t+1]
+Instead of predicting the next level directly, the model predicts the residual in this transformed space:
+r_model[t+1] = y_model[t+1] − y_model[t]
+y_hat_model[t+1] = y_model[t] + r_hat_model[t+1]
 
 A GRU-based network is trained to estimate the residual from recent target history:
-r_hat[t+1] = g(y[t−w+1 : t])
+r_hat_model[t+1] = g(y_model[t−w+1 : t])
+
+After prediction, values are mapped back to the original scale using:
+y_hat[t+1] = exp(y_hat_model[t+1]) − 1
 
 This formulation:
 
